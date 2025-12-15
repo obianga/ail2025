@@ -1,0 +1,535 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
+import plotly.graph_objects as go
+import plotly.express as px
+
+# Page config with custom theme
+st.set_page_config(
+    page_title="AIL-2045 Crypto Finance Model", 
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'About': "AIL-2045 Bitcoin Finance Model for African Infrastructure"
+    }
+)
+
+# Custom CSS for beautiful styling
+st.markdown("""
+<style>
+    .main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .stApp {
+        background: linear-gradient(to bottom right, #1a1a2e, #16213e);
+    }
+    h1 {
+        color: #F7931A;
+        text-align: center;
+        font-size: 3rem !important;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        padding: 20px 0;
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+        from { text-shadow: 0 0 5px #F7931A, 0 0 10px #F7931A; }
+        to { text-shadow: 0 0 10px #F7931A, 0 0 20px #F7931A, 0 0 30px #F7931A; }
+    }
+    h3 {
+        color: #00d4ff;
+        text-align: center;
+        font-size: 1.3rem !important;
+    }
+    .stMetric {
+        background: linear-gradient(135deg, rgba(247, 147, 26, 0.1), rgba(0, 212, 255, 0.1));
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid rgba(247, 147, 26, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(4px);
+    }
+    .stMetric label {
+        color: #00d4ff !important;
+        font-size: 1.1rem !important;
+        font-weight: bold !important;
+    }
+    .stMetric [data-testid="stMetricValue"] {
+        color: #F7931A !important;
+        font-size: 2rem !important;
+        font-weight: bold !important;
+    }
+    .stMetric [data-testid="stMetricDelta"] {
+        color: #4ade80 !important;
+    }
+    .sidebar .sidebar-content {
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    }
+    .stSelectbox, .stSlider {
+        color: #00d4ff;
+    }
+    .project-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 25px;
+        border-radius: 15px;
+        border: 2px solid rgba(247, 147, 26, 0.3);
+        margin: 10px 0;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+    .success-box {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2));
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 5px solid #10b981;
+        color: #4ade80;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 20px 0;
+    }
+    .info-box {
+        background: rgba(0, 212, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #00d4ff;
+        margin: 10px 0;
+    }
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: rgba(247, 147, 26, 0.1);
+        border-radius: 10px 10px 0 0;
+        padding: 10px 20px;
+        color: #00d4ff;
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(247, 147, 26, 0.3), rgba(0, 212, 255, 0.3));
+        color: #F7931A;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Header
+st.markdown("<h1>🚀 AIL-2045 Bitcoin Finance Model</h1>", unsafe_allow_html=True)
+st.markdown("<h3>💎 6 Real AfDB/Afreximbank Projects | Fixed Gap % | AIF 2025 Ready</h3>", unsafe_allow_html=True)
+
+# Sidebar with enhanced styling
+st.sidebar.markdown("## 🎛️ Global Parameters")
+st.sidebar.markdown("---")
+
+st.sidebar.markdown("### 💰 Bitcoin Settings")
+btc_seed = st.sidebar.slider("BTC Seed Capital ($B)", 5.0, 100.0, 35.0, 5.0)
+btc_cagr = st.sidebar.slider("BTC Annual Growth Rate (%)", 1.0, 30.0, 15.0, 1.0) / 100
+years = st.sidebar.slider("Investment Horizon (Years)", 5, 30, 19)
+
+st.sidebar.markdown("### 📊 Financing Instruments")
+bond_amount = st.sidebar.slider("BTC-Backed Bonds ($B)", 10.0, 400.0, 200.0, 25.0)
+bond_yield = st.sidebar.slider("Bond Yield (%)", 1.0, 8.0, 4.0, 0.5) / 100
+fdi_amount = st.sidebar.slider("Crypto FDI ($B)", 5.0, 150.0, 50.0, 10.0)
+nft_amount = st.sidebar.slider("Carbon NFTs ($B)", 1.0, 100.0, 15.0, 5.0)
+
+st.sidebar.markdown("---")
+st.sidebar.info("💡 Adjust parameters to see real-time impact on African infrastructure financing")
+
+# Calculations
+btc_final = btc_seed * (1 + btc_cagr) ** years
+btc_gain = btc_final - btc_seed
+bond_interest = bond_amount * bond_yield * 10
+fdi_return = fdi_amount * (1.20 ** 10)
+nft_return = nft_amount * (1.12 ** years)
+total_unlocked = btc_final + bond_interest + fdi_return + nft_return
+gap_covered = total_unlocked / 1.5  # Africa's $1.5T gap
+roi_crypto = ((total_unlocked - (btc_seed + bond_amount + fdi_amount + nft_amount)) / 
+              (btc_seed + bond_amount + fdi_amount + nft_amount)) * 100
+
+# Traditional finance comparison
+trad_cost = (bond_amount * 0.07 * 10) + (fdi_amount * 0.08 * 10) + (btc_seed * 0.03 * years)
+savings = (bond_interest + fdi_return + btc_gain + nft_return) - trad_cost
+jobs = int(total_unlocked * 100_000)
+
+# Key Metrics Dashboard
+st.markdown("## 📈 Key Performance Indicators")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric(
+        "🪙 BTC Value 2045", 
+        f"${btc_final:,.1f}B", 
+        f"+${btc_gain:,.1f}B ({(btc_gain/btc_seed)*100:.0f}%)"
+    )
+    st.metric(
+        "💎 Total Capital Unlocked", 
+        f"${total_unlocked:,.1f}B",
+        f"↑ {total_unlocked/btc_seed:.1f}x multiplier"
+    )
+
+with col2:
+    st.metric(
+        "🎯 Financing Gap Covered", 
+        f"{gap_covered:.1%}",
+        f"${total_unlocked:,.1f}B / $1.5T target"
+    )
+    st.metric(
+        "📊 Crypto ROI", 
+        f"{roi_crypto:,.0f}%",
+        f"vs {(trad_cost/(btc_seed + bond_amount + fdi_amount))*100:.0f}% traditional"
+    )
+
+with col3:
+    st.metric(
+        "💵 Savings vs Traditional", 
+        f"${savings:,.1f}B",
+        f"{(savings/trad_cost)*100:.0f}% cost reduction"
+    )
+    st.metric(
+        "👷 Jobs Created", 
+        f"{jobs:,}",
+        f"{jobs/1_000_000:.1f}M employment"
+    )
+
+# Interactive Charts in Tabs
+st.markdown("## 📊 Visual Analytics")
+tab1, tab2, tab3, tab4 = st.tabs(["📈 Growth Trajectory", "🥧 Capital Breakdown", "⚡ ROI Comparison", "🌍 Impact Metrics"])
+
+with tab1:
+    # Enhanced Matplotlib chart
+    years_list = list(range(2026, 2026 + years + 1))
+    btc_curve = np.array([btc_seed * (1 + btc_cagr) ** i for i in range(years + 1)])
+    
+    fig, ax = plt.subplots(figsize=(14, 8), facecolor='#1a1a2e')
+    ax.set_facecolor('#16213e')
+    
+    # Main BTC growth line
+    ax.plot(years_list, btc_curve, label="BTC Growth Trajectory", 
+            color="#F7931A", linewidth=4, marker='o', markersize=6, 
+            markerfacecolor='#FFD700', markeredgecolor='#F7931A', markeredgewidth=2)
+    
+    # $1.5T Gap line
+    ax.axhline(1500, color="#ff4757", linestyle="--", linewidth=3, 
+               label="$1.5T Financing Gap", alpha=0.8)
+    
+    # Shaded areas
+    below_mask = btc_curve <= 1500
+    ax.fill_between(years_list, btc_curve, 0, where=below_mask, 
+                     color="#F7931A", alpha=0.2, label="Gap Closure Progress")
+    ax.fill_between(years_list, btc_curve, 1500, where=below_mask, 
+                     color="#F7931A", alpha=0.1)
+    
+    above_mask = btc_curve > 1500
+    ax.fill_between(years_list, btc_curve, 1500, where=above_mask, 
+                     color="#4ade80", alpha=0.3, label="Capital Surplus")
+    
+    # Annotations with better styling
+    ax.text(years_list[0] - 0.5, btc_seed + 80, 
+            f"🚀 Start\n${btc_seed:.0f}B", 
+            color="#00d4ff", fontsize=13, fontweight='bold', 
+            ha='right', bbox=dict(boxstyle='round', facecolor='#1a1a2e', alpha=0.8))
+    ax.text(years_list[-1] + 0.5, btc_curve[-1], 
+            f"🎯 Target\n${btc_curve[-1]:.0f}B", 
+            color="#4ade80", fontsize=13, fontweight='bold', 
+            ha='left', bbox=dict(boxstyle='round', facecolor='#1a1a2e', alpha=0.8))
+    
+    # Styling
+    ax.set_title("How Bitcoin Growth Closes Africa's $1.5T Financing Gap", 
+                 fontsize=18, pad=25, color='white', fontweight='bold')
+    ax.set_xlabel("Year", fontsize=14, color='white')
+    ax.set_ylabel("Capital ($ Billion)", fontsize=14, color='white')
+    ax.set_ylim(0, max(1500, btc_curve.max() * 1.15))
+    ax.set_xlim(years_list[0] - 1, years_list[-1] + 1)
+    ax.grid(True, alpha=0.2, linestyle='--', color='white')
+    ax.legend(loc='upper left', frameon=True, fancybox=True, 
+              shadow=True, fontsize=11, facecolor='#1a1a2e', 
+              edgecolor='#F7931A', labelcolor='white')
+    ax.tick_params(colors='white', labelsize=10)
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"${x:.0f}B"))
+    
+    st.pyplot(fig)
+
+with tab2:
+    # Pie chart with Plotly
+    labels = ['BTC Holdings', 'Bond Interest', 'Crypto FDI Returns', 'Carbon NFTs']
+    values = [btc_final, bond_interest, fdi_return, nft_return]
+    colors = ['#F7931A', '#00d4ff', '#4ade80', '#a78bfa']
+    
+    fig_pie = go.Figure(data=[go.Pie(
+        labels=labels, 
+        values=values,
+        hole=0.4,
+        marker=dict(colors=colors, line=dict(color='#1a1a2e', width=2)),
+        textinfo='label+percent',
+        textfont=dict(size=14, color='white'),
+        hovertemplate='<b>%{label}</b><br>$%{value:.1f}B<br>%{percent}<extra></extra>'
+    )])
+    
+    fig_pie.update_layout(
+        title="Capital Source Breakdown 2045",
+        title_font=dict(size=20, color='white'),
+        paper_bgcolor='#1a1a2e',
+        plot_bgcolor='#16213e',
+        showlegend=True,
+        legend=dict(font=dict(color='white')),
+        height=500
+    )
+    
+    st.plotly_chart(fig_pie, use_container_width=True)
+
+with tab3:
+    # ROI Comparison Bar Chart
+    comparison_data = pd.DataFrame({
+        'Financing Method': ['Crypto Model', 'Traditional Finance'],
+        'ROI (%)': [roi_crypto, (trad_cost/(btc_seed + bond_amount + fdi_amount))*100],
+        'Total Return ($B)': [total_unlocked, trad_cost]
+    })
+    
+    fig_bar = go.Figure(data=[
+        go.Bar(
+            x=comparison_data['Financing Method'],
+            y=comparison_data['ROI (%)'],
+            text=comparison_data['ROI (%)'].apply(lambda x: f'{x:.0f}%'),
+            textposition='auto',
+            marker=dict(
+                color=['#F7931A', '#ff4757'],
+                line=dict(color='white', width=2)
+            ),
+            hovertemplate='<b>%{x}</b><br>ROI: %{y:.0f}%<extra></extra>'
+        )
+    ])
+    
+    fig_bar.update_layout(
+        title="ROI Comparison: Crypto vs Traditional Financing",
+        title_font=dict(size=20, color='white'),
+        xaxis=dict(title="Financing Method", color='white'),
+        yaxis=dict(title="Return on Investment (%)", color='white'),
+        paper_bgcolor='#1a1a2e',
+        plot_bgcolor='#16213e',
+        height=500,
+        showlegend=False
+    )
+    
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+with tab4:
+    # Impact metrics visualization
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 🌍 Socioeconomic Impact")
+        impact_data = {
+            "Metric": ["Jobs Created", "GDP Impact", "Carbon Credits", "Infrastructure Projects"],
+            "Value": [
+                f"{jobs:,}",
+                f"${total_unlocked * 0.3:,.1f}B",
+                f"{nft_return * 100:,.0f}M tons",
+                f"{int(total_unlocked / 0.5):,}"
+            ]
+        }
+        st.dataframe(
+            pd.DataFrame(impact_data),
+            use_container_width=True,
+            hide_index=True
+        )
+    
+    with col2:
+        st.markdown("### ⚡ Efficiency Gains")
+        efficiency_data = {
+            "Metric": ["Cost Savings", "Time Reduction", "Transparency", "Access to Capital"],
+            "Improvement": [
+                f"{(savings/trad_cost)*100:.0f}%",
+                "60%",
+                "95%",
+                f"{(total_unlocked/1500)*100:.0f}%"
+            ]
+        }
+        st.dataframe(
+            pd.DataFrame(efficiency_data),
+            use_container_width=True,
+            hide_index=True
+        )
+
+# Project Selection Section
+st.markdown("## 🏗️ Real African Infrastructure Projects")
+st.markdown("---")
+
+projects = {
+    "🚄 LAPSSET Corridor ($1.2B)": {
+        "description": "Lamu Port-South Sudan-Ethiopia Transport Corridor",
+        "country": "Kenya, Ethiopia, South Sudan",
+        "type": "BTC Bond",
+        "min": 100, "max": 1000, "default": 500
+    },
+    "⚡ Rufiji Hydro Dam ($0.5B)": {
+        "description": "2,100 MW Hydroelectric Power Project",
+        "country": "Tanzania",
+        "type": "Crypto FDI",
+        "min": 50, "max": 500, "default": 200
+    },
+    "🌾 Eastern Angola Agri ($211M)": {
+        "description": "Agricultural Development Zone",
+        "country": "Angola",
+        "type": "BTC Bond",
+        "min": 50, "max": 300, "default": 100
+    },
+    "💊 Egypt Pharma ($746M)": {
+        "description": "Pharmaceutical Manufacturing Hub",
+        "country": "Egypt",
+        "type": "BTC Bond",
+        "min": 100, "max": 1000, "default": 300
+    },
+    "🚂 Nacala Corridor ($2.7B)": {
+        "description": "Railway and Port Development",
+        "country": "Mozambique, Malawi, Zambia",
+        "type": "BTC Bond",
+        "min": 300, "max": 1500, "default": 800
+    },
+    "🏭 Nigeria Mfg Zones ($300M+)": {
+        "description": "Special Economic Zones",
+        "country": "Nigeria",
+        "type": "Crypto FDI",
+        "min": 50, "max": 500, "default": 150
+    }
+}
+
+proj = st.selectbox("🎯 Select Infrastructure Project", list(projects.keys()))
+
+# Project details card
+project_info = projects[proj]
+st.markdown(f"""
+<div class="project-card">
+    <h3 style="color: #F7931A; margin-top: 0;">{proj}</h3>
+    <p style="color: #00d4ff; font-size: 1.1rem;"><strong>Description:</strong> {project_info['description']}</p>
+    <p style="color: white;"><strong>🌍 Location:</strong> {project_info['country']}</p>
+    <p style="color: white;"><strong>💰 Financing Type:</strong> {project_info['type']}</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Project calculations
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    tranche = st.slider(
+        f"Investment Amount ($M) - {project_info['type']}", 
+        project_info['min'], 
+        project_info['max'], 
+        project_info['default'],
+        step=50
+    )
+
+# Calculate returns based on project type
+if "Bond" in project_info['type']:
+    value = tranche / 1000 * (1 + btc_cagr) ** years
+    investment_period = years
+    annual_return = btc_cagr * 100
+else:  # FDI
+    fdi_years = 10
+    if "Rufiji" in proj:
+        value = tranche / 1000 * (1.22 ** fdi_years)
+        annual_return = 22
+    else:
+        value = tranche / 1000 * (1.25 ** fdi_years)
+        annual_return = 25
+    investment_period = fdi_years
+
+roi_project = ((value * 1000 - tranche) / tranche) * 100
+
+with col2:
+    st.markdown(f"""
+    <div class="info-box">
+        <h4 style="color: #00d4ff; margin-top: 0;">Investment Details</h4>
+        <p style="color: white;"><strong>Period:</strong> {investment_period} years</p>
+        <p style="color: white;"><strong>Avg Return:</strong> {annual_return}% p.a.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Results display
+st.markdown(f"""
+<div class="success-box">
+    💰 <strong>Initial Investment:</strong> ${tranche:,.0f}M<br>
+    📈 <strong>Final Value:</strong> ${value:,.2f}B<br>
+    🚀 <strong>Total Gain:</strong> ${(value - tranche/1000):,.2f}B<br>
+    📊 <strong>ROI:</strong> {roi_project:,.0f}%<br>
+    ⏱️ <strong>Investment Period:</strong> {investment_period} years
+</div>
+""", unsafe_allow_html=True)
+
+# Additional project metrics
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("💼 Jobs from This Project", f"{int(value * 100_000):,}")
+with col2:
+    st.metric("🌍 Local GDP Impact", f"${value * 0.4:,.2f}B")
+with col3:
+    st.metric("⚡ Multiplier Effect", f"{(value/(tranche/1000)):.1f}x")
+
+# Export Section
+st.markdown("## 📥 Export & Documentation")
+st.markdown("---")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    # Forecast data
+    years_list = list(range(2026, 2026 + years + 1))
+    btc_curve = [btc_seed * (1 + btc_cagr) ** i for i in range(years + 1)]
+    
+    df_forecast = pd.DataFrame({
+        "Year": years_list,
+        "BTC Value ($B)": [f"${x:.2f}" for x in btc_curve],
+        "Cumulative Gain ($B)": [f"${x - btc_seed:.2f}" for x in btc_curve],
+        "Gap Coverage (%)": [f"{(x/1.5)*100:.1f}%" for x in btc_curve]
+    })
+    
+    csv_forecast = df_forecast.to_csv(index=False)
+    st.download_button(
+        "📊 Download Full Forecast (CSV)",
+        csv_forecast,
+        "ail2045_forecast.csv",
+        "text/csv",
+        use_container_width=True
+    )
+
+with col2:
+    # Summary report
+    summary_data = {
+        "Metric": [
+            "BTC Seed Capital",
+            "BTC Final Value 2045",
+            "Total Capital Unlocked",
+            "Financing Gap Covered",
+            "Crypto ROI",
+            "Jobs Created",
+            "Cost Savings"
+        ],
+        "Value": [
+            f"${btc_seed:.1f}B",
+            f"${btc_final:.1f}B",
+            f"${total_unlocked:.1f}B",
+            f"{gap_covered:.1%}",
+            f"{roi_crypto:.0f}%",
+            f"{jobs:,}",
+            f"${savings:.1f}B"
+        ]
+    }
+    df_summary = pd.DataFrame(summary_data)
+    csv_summary = df_summary.to_csv(index=False)
+    
+    st.download_button(
+        "📋 Download Summary Report (CSV)",
+        csv_summary,
+        "ail2045_summary.csv",
+        "text/csv",
+        use_container_width=True
+    )
+
+# Footer
+st.markdown("---")
+st.markdown("""
+<div style="text-align: center; color: #00d4ff; padding: 20px;">
+    <h4>🚀 AIL-2045 | AIF 2025 Ready</h4>
+    <p style="color: white;">Revolutionizing African Infrastructure Finance through Bitcoin & Crypto Innovation</p>
+    <p style="color: #F7931A;"><strong>Built with ❤️ for Africa's Future</strong></p>
+    <p style="font-size: 0.9rem; color: gray;">
+        Data sources: AfDB, Afreximbank, World Bank | Model: AIL-2045 v2.0
+    </p>
+</div>
+""", unsafe_allow_html=True)
