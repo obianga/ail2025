@@ -214,7 +214,7 @@ st.markdown("""
 
 # Header
 st.markdown("<h1>🚀 Bitcoin & Crypto Finance Platform</h1>", unsafe_allow_html=True)
-st.markdown("<h3>💎 6 Real AfDB/Afreximbank Projects | Fixed Gap % | AIF 2025 Ready</h3>", unsafe_allow_html=True)
+st.markdown("<h3>💎 Bridge $1.5T infrastructure gap with Bitcoin, bonds, FDI, and NFTs (2026–2045)</h3>", unsafe_allow_html=True)
 
 # Sidebar with enhanced styling
 st.sidebar.markdown("## 🎛️ Global Parameters")
