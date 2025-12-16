@@ -241,7 +241,7 @@ bond_interest = bond_amount * bond_yield * 10
 fdi_return = fdi_amount * (1.20 ** 10)
 nft_return = nft_amount * (1.12 ** years)
 total_unlocked = btc_final + bond_interest + fdi_return + nft_return
-gap_covered = total_unlocked / 1.5  # Africa's $1.5T gap
+gap_covered = (total_unlocked / 1500) * 100  # Africa's $1.5T gap
 roi_crypto = ((total_unlocked - (btc_seed + bond_amount + fdi_amount + nft_amount)) / 
               (btc_seed + bond_amount + fdi_amount + nft_amount)) * 100
 
