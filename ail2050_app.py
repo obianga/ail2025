@@ -223,7 +223,7 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("### 💰 Bitcoin Settings")
 btc_seed = st.sidebar.slider("BTC Reserve Seed ($B)", 5.0, 100.0, 35.0, 5.0)
 btc_cagr = st.sidebar.slider("BTC Annual Growth Rate (%)", 1.0, 30.0, 15.0, 1.0) / 100
-years = st.sidebar.slider(" Forecast Years (Years)", 5, 30, 19)
+years = st.sidebar.slider(" Forecast (Years)", 5, 30, 19)
 
 st.sidebar.markdown("### 📊 Financing Instruments")
 bond_amount = st.sidebar.slider("Tokenized Bonds ($B)", 10.0, 400.0, 200.0, 25.0)
