@@ -450,7 +450,7 @@ with tab4:
         )
 
 #  Removed duplicates, simplified layout
-st.markdown("## 🏗️ Real 6 African Infrastructure Projects - Afreximbank/AfDB/World Bank
+st.markdown("## 🏗️ Real 6 African Infrastructure Projects - Afreximbank/AfDB/World Bank")
 
 # Projects data
 projects_data = {
