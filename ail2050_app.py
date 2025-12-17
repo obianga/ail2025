@@ -450,7 +450,8 @@ with tab4:
         )
 
 #  Removed duplicates, simplified layout
-st.markdown("## 🏗️ Real 6 African Infrastructure Projects - Afreximbank/AfDB/World Bank")
+st.markdown("## 🏗️ Real 6 African Infrastructure Projects - Afreximbank/AfDB/World Bank
+
 # Projects data
 projects_data = {
     "LAPSSET": {
@@ -518,7 +519,7 @@ def render_project_tab(project_key, project_data):
     # Simple project header with key info only
     st.markdown(f"""
     <div style="margin-bottom: 20px;">
-        <h3 style="color: #F7931A; font-size: 1.5rem; margin-bottom: 8px;">
+        <h3 style="color: #F7931A; font-size: 1.5rem; margin-bottom: 8px; text-align: left;">
             {project_data['icon']} {project_data['name']} - {project_data['budget']}
         </h3>
         <div style="display: flex; gap: 10px;">
