@@ -449,184 +449,169 @@ with tab4:
             hide_index=True
         )
 
-# Project Selection Section
-st.markdown("## 🏗️ Real African Infrastructure Projects")
-st.markdown("---")
-
-projects = {
-    "🚄 LAPSSET Corridor ($1.2B)": {
-        "description": "Lamu Port-South Sudan-Ethiopia Transport Corridor",
+#  Removed duplicates, simplified layout
+st.markdown("## 🏗️ Real 6 African Infrastructure Projects - Afreximbank/AfDB/World Bank")
+# Projects data
+projects_data = {
+    "LAPSSET": {
+        "name": "LAPSSET Corridor",
+        "budget": "$1.2B",
         "country": "Kenya, Ethiopia, South Sudan",
         "type": "BTC Bond",
-        "min": 100, "max": 1000, "default": 500
+        "min": 100, "max": 1000, "default": 500,
+        "icon": "🚄"
     },
-    "⚡ Rufiji Hydro Dam ($0.5B)": {
-        "description": "2,100 MW Hydroelectric Power Project",
+    "Rufiji": {
+        "name": "Rufiji Hydro Dam",
+        "budget": "$0.5B",
         "country": "Tanzania",
         "type": "Crypto FDI",
-        "min": 50, "max": 500, "default": 200
+        "min": 50, "max": 500, "default": 200,
+        "icon": "⚡"
     },
-    "🌾 Eastern Angola Agri ($211M)": {
-        "description": "Agricultural Development Zone",
+    "Angola": {
+        "name": "Eastern Angola Agri",
+        "budget": "$211M",
         "country": "Angola",
         "type": "BTC Bond",
-        "min": 50, "max": 300, "default": 100
+        "min": 50, "max": 300, "default": 100,
+        "icon": "🌾"
     },
-    "💊 Egypt Pharma ($746M)": {
-        "description": "Pharmaceutical Manufacturing Hub",
+    "Egypt": {
+        "name": "Egypt Pharma Hub",
+        "budget": "$746M",
         "country": "Egypt",
         "type": "BTC Bond",
-        "min": 100, "max": 1000, "default": 300
+        "min": 100, "max": 1000, "default": 300,
+        "icon": "💊"
     },
-    "🚂 Nacala Corridor ($2.7B)": {
-        "description": "Railway and Port Development",
+    "Nacala": {
+        "name": "Nacala Corridor",
+        "budget": "$2.7B",
         "country": "Mozambique, Malawi, Zambia",
         "type": "BTC Bond",
-        "min": 300, "max": 1500, "default": 800
+        "min": 300, "max": 1500, "default": 800,
+        "icon": "🚂"
     },
-    "🏭 Nigeria Mfg Zones ($300M+)": {
-        "description": "Special Economic Zones",
+    "Nigeria": {
+        "name": "Nigeria Mfg Zones",
+        "budget": "$300M+",
         "country": "Nigeria",
         "type": "Crypto FDI",
-        "min": 50, "max": 500, "default": 150
+        "min": 50, "max": 500, "default": 150,
+        "icon": "🏭"
     }
 }
 
-proj = st.selectbox("🎯 Select Infrastructure Project", list(projects.keys()))
+# Create tabs for each project
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "🚄 LAPSSET",
+    "⚡ Rufiji", 
+    "🌾 Angola",
+    "💊 Egypt",
+    "🚂 Nacala",
+    "🏭 Nigeria"
+])
 
-# Project details and calculations
-project_info = projects[proj]
-
-# Create layout: Left (60%) for input, Right (40%) for results
-col_left, col_right = st.columns([3, 2])
-
-with col_left:
-    # Project info card - compact and clean
+# Function to render SIMPLIFIED project tab
+def render_project_tab(project_key, project_data):
+    # Simple project header with key info only
     st.markdown(f"""
-    <div class="project-card" style="margin-bottom: 20px;">
-        <h3 style="color: #F7931A; margin-top: 0; margin-bottom: 10px;">{proj}</h3>
-        <p style="color: #00d4ff; font-size: 1rem; margin-bottom: 15px;">{project_info['description']}</p>
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <span style="background: rgba(0, 212, 255, 0.2); padding: 5px 12px; border-radius: 15px; color: #00d4ff; font-size: 0.9rem;">📍 {project_info['country']}</span>
-            <span style="background: rgba(247, 147, 26, 0.2); padding: 5px 12px; border-radius: 15px; color: #F7931A; font-size: 0.9rem;">💰 {project_info['type']}</span>
+    <div style="margin-bottom: 20px;">
+        <h3 style="color: #F7931A; font-size: 1.5rem; margin-bottom: 8px;">
+            {project_data['icon']} {project_data['name']} - {project_data['budget']}
+        </h3>
+        <div style="display: flex; gap: 10px;">
+            <span style="background: rgba(0, 212, 255, 0.15); padding: 5px 12px; border-radius: 15px; 
+                         color: #00d4ff; font-size: 0.85rem;">
+                📍 {project_data['country']}
+            </span>
+            <span style="background: rgba(247, 147, 26, 0.15); padding: 5px 12px; border-radius: 15px; 
+                         color: #F7931A; font-size: 0.85rem;">
+                💰 {project_data['type']}
+            </span>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Investment slider - BIGGER
-    st.markdown("<h3 style='color: #00d4ff; font-size: 1.3rem; margin-top: 25px;'>💵 Investment Amount</h3>", unsafe_allow_html=True)
+    # Investment slider (no extra header needed)
     tranche = st.slider(
-        "Adjust investment amount ($M)", 
-        project_info['min'], 
-        project_info['max'], 
-        project_info['default'],
-        step=50,
-        key=f"slider_{proj}",
-        label_visibility="collapsed"
+        f"Investment Amount ($M)",
+        min_value=project_data['min'],
+        max_value=project_data['max'],
+        value=project_data['default'],
+        step=25,
+        key=f"tab_slider_{project_key}"
     )
     
-    # Display current investment value - BIGGER
-    st.markdown(f"""
-    <div style="text-align: center; margin: 20px 0;">
-        <h2 style="color: #F7931A; font-size: 3rem; margin: 0;">${tranche:,}M</h2>
-        <p style="color: #00d4ff; font-size: 1.2rem; margin: 5px 0;">Current Investment Amount</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Calculate returns
+    if "Bond" in project_data['type']:
+        value = tranche / 1000 * (1 + btc_cagr) ** years
+        investment_period = years
+        annual_return = btc_cagr * 100
+    else:  # FDI
+        fdi_years = 10
+        if project_key == "Rufiji":
+            value = tranche / 1000 * (1.22 ** fdi_years)
+            annual_return = 22
+        else:
+            value = tranche / 1000 * (1.25 ** fdi_years)
+            annual_return = 25
+        investment_period = fdi_years
+    
+    roi_project = ((value * 1000 - tranche) / tranche) * 100
+    gain = value - tranche/1000
+    jobs_created = int(value * 100_000)
+    
+    # CLEAN results - just 4 key metrics in one row
+    st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric(
+            label="💰 Investment",
+            value=f"${tranche:,}M"
+        )
+    
+    with col2:
+        st.metric(
+            label="🚀 Value 2045",
+            value=f"${value:.2f}B",
+            delta=f"+{roi_project:,.0f}%"
+        )
+    
+    with col3:
+        st.metric(
+            label="📈 Gain",
+            value=f"${gain:.2f}B",
+            delta=f"{investment_period}yr"
+        )
+    
+    with col4:
+        st.metric(
+            label="👷 Jobs",
+            value=f"{jobs_created:,}",
+            delta=f"{annual_return:.1f}%"
+        )
 
-# Calculate returns based on project type
-if "Bond" in project_info['type']:
-    value = tranche / 1000 * (1 + btc_cagr) ** years
-    investment_period = years
-    annual_return = btc_cagr * 100
-else:  # FDI
-    fdi_years = 10
-    if "Rufiji" in proj:
-        value = tranche / 1000 * (1.22 ** fdi_years)
-        annual_return = 22
-    else:
-        value = tranche / 1000 * (1.25 ** fdi_years)
-        annual_return = 25
-    investment_period = fdi_years
+# Render each tab with CLEAN layout
+with tab1:
+    render_project_tab("LAPSSET", projects_data["LAPSSET"])
 
-roi_project = ((value * 1000 - tranche) / tranche) * 100
-gain = value - tranche/1000
-jobs_created = int(value * 100_000)
+with tab2:
+    render_project_tab("Rufiji", projects_data["Rufiji"])
 
-with col_left:
-    # Compact one-line info
-    st.markdown(f"""
-    <p style="color: #a0a0a0; font-size: 0.9rem; margin-top: 10px; margin-bottom: 0; text-align: center;">
-        ⏱️ {investment_period} years @ {annual_return:.1f}% CAGR
-    </p>
-    """, unsafe_allow_html=True)
+with tab3:
+    render_project_tab("Angola", projects_data["Angola"])
 
-with col_right:
-    # Results card - clean and focused with dark theme
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.25));
-        padding: 25px;
-        border-radius: 15px;
-        border: 2px solid rgba(74, 222, 128, 0.4);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        margin-top: 0;
-    ">
-        <h2 style="color: white; font-size: 2.5rem; margin: 0; margin-bottom: 5px;">${value:.2f}B</h2>
-        <p style="color: #a0a0a0; font-size: 1rem; margin: 0; margin-bottom: 20px;">2045 Value</p>
-        <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 20px 0;">
-        <div style="margin-top: 15px;">
-            <p style="color: white; font-size: 1.1rem; margin: 10px 0;">↗️ <strong>Gain:</strong> ${gain:.2f}B</p>
-            <p style="color: white; font-size: 1.1rem; margin: 10px 0;">🔥 <strong>ROI:</strong> {roi_project:,.0f}%</p>
-            <p style="color: white; font-size: 1.1rem; margin: 10px 0;">💼 <strong>Jobs:</strong> {jobs_created:,}</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+with tab4:
+    render_project_tab("Egypt", projects_data["Egypt"])
 
-# Additional project metrics - three small cards
-st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
-col1, col2, col3 = st.columns(3)
+with tab5:
+    render_project_tab("Nacala", projects_data["Nacala"])
 
-with col1:
-    st.markdown(f"""
-    <div style="
-        background: rgba(0, 212, 255, 0.1);
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid rgba(0, 212, 255, 0.3);
-        text-align: center;
-    ">
-        <p style="color: #00d4ff; font-size: 0.9rem; margin: 0;">🌍 GDP Impact</p>
-        <h3 style="color: white; font-size: 1.5rem; margin: 10px 0;">${value * 0.4:.2f}B</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown(f"""
-    <div style="
-        background: rgba(247, 147, 26, 0.1);
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid rgba(247, 147, 26, 0.3);
-        text-align: center;
-    ">
-        <p style="color: #F7931A; font-size: 0.9rem; margin: 0;">⚡ Multiplier</p>
-        <h3 style="color: white; font-size: 1.5rem; margin: 10px 0;">{(value/(tranche/1000)):.1f}x</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col3:
-    st.markdown(f"""
-    <div style="
-        background: rgba(74, 222, 128, 0.1);
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid rgba(74, 222, 128, 0.3);
-        text-align: center;
-    ">
-        <p style="color: #4ade80; font-size: 0.9rem; margin: 0;">🕐 Breakeven</p>
-        <h3 style="color: white; font-size: 1.5rem; margin: 10px 0;">{investment_period/2.5:.1f} years</h3>
-    </div>
-    """, unsafe_allow_html=True)
+with tab6:
+    render_project_tab("Nigeria", projects_data["Nigeria"])
 
 # Export Section
 st.markdown("## 📥 Export & Documentation")
